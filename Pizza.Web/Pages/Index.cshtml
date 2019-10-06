@@ -1,0 +1,61 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Pizza Stuff";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Se menuen for <a href="http://www.billundpizza.dk">Billund Pizza &amp; Steakhouse</a>!</h1>
+</div>
+
+<div class="table-responsive">
+    <table id="menuTable"
+           class="table table-bordered table-hover table-sm"
+           data-toggle="table"
+           data-ajax="ajaxRequest"
+           data-group-by="true"
+           data-group-by-field="category"
+           data-sortable="true"
+           data-show-columns="true"
+           data-filter-control="true"
+           data-show-search-clear-button="true">
+        <thead>
+            <tr>
+                <th class="text-nowrap align-text-top" data-sortable="true" data-field="number">Nummer</th>
+                <th class="text-nowrap align-text-top" data-sortable="true" data-field="name" data-filter-control="input">Navn</th>
+                <th class="align-text-top" data-sortable="true" data-field="description" data-filter-control="input">Beskrivelse</th>
+                <th class="text-nowrap align-text-top" data-sortable="true" data-field="price">Pris</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+@section Scripts {
+
+    <script>
+        function ajaxRequest(params) {
+            const url = "https://cavi-sl-pizzaapi.azurewebsites.net/api/items";
+            $.get(url).then(function (res) {
+                // Reformats the JSON result to the table
+                const result = new Array();
+                for (let cat of res) {
+                    const categoryName = cat.name;
+                    for (let item of cat.items) {
+                        const menuItem = {
+                            category: categoryName,
+                            number: item.number,
+                            name: item.name,
+                            description: item.description,
+                            price: `DKK ${item.price.toFixed(2).replace(".", ",")}`
+                        };
+                        result.push(menuItem);
+                    }
+
+                }
+
+                params.success(result);
+            });
+        }
+    </script>
+
+}
